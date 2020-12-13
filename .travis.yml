@@ -1,0 +1,24 @@
+language: python
+
+python:
+  - "3.6"      # current default Python on Travis CI
+  - "3.7"
+  - "3.8"
+
+install:
+  - pip install -r requirements.txt
+  - pip install pytest-cov
+  - pip install coveralls
+# I do not install the package itself otherwise link to the source code cannot be established for coverage
+#  - pip install .
+
+script:
+  - PYTHONPATH=src:{PYTHONPATH} pytest --cov=mylib ./tests
+# Using pytest-cov, coverage is also invoked, so no need to do the following:
+#  - coverage run --source=mylib -m pytest ./tests
+
+after_success:
+  # This is for Codecov.io
+  - bash <(curl -s https://codecov.io/bash)
+  # This is for Coveralls.io
+  - coveralls -v

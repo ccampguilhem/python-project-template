@@ -1,7 +1,7 @@
 #!coding: utf-8
-from mylib.hello import hello
+import mylib
 
 
 def test_hello():
-    assert hello("Cédric") == "Hello Cédric!"
-    assert hello("") == "Hello !"
+    assert mylib.hello.hello("Cédric") == "Hello Cédric!"
+    assert mylib.hello.hello("") == "Hello !"
