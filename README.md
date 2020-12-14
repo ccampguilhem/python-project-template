@@ -5,7 +5,8 @@
 [![PyPI - Format](https://img.shields.io/pypi/format/mylib-template)](https://pypi.org/project/mylib-template/)
 [![GitHub](https://img.shields.io/github/license/ccampguilhem/python-project-template)](https://github.com/ccampguilhem/python-project-template/blob/master/LICENSE)
 
-[![Build Status](https://travis-ci.org/ccampguilhem/python-project-template.svg?branch=master)](https://travis-ci.org/ccampguilhem/python-project-template)
+[![Travis (.org) branch](https://img.shields.io/travis/ccampguilhem/python-project-template/master?label=Travis%20CI&logo=travis)](https://travis-ci.org/ccampguilhem/python-project-template)
+[![Build Status](https://jenkins.kango.ovh/buildStatus/icon?job=python-project-template&subject=Jenkins&logo=jenkins)](https://jenkins.kango.ovh/job/python-project-template/)
 [![Coveralls github](https://img.shields.io/coveralls/github/ccampguilhem/python-project-template?logo=coveralls)](https://coveralls.io/github/ccampguilhem/python-project-template)
 [![Codecov](https://img.shields.io/codecov/c/github/ccampguilhem/python-project-template?logo=codecov)](https://codecov.io/gh/ccampguilhem/python-project-template)
 
@@ -84,8 +85,16 @@ conda install -c conda-forge pipreqs
 Then, from within the source tree:
 
 ```bash
-pipreqs
+pipreqs --force
 ```
+
+Alternately, you can use make:
+
+```bash
+make reqs
+```
+
+The `requirements_tests.txt` file contains additional requirements for testing. 
 
 ## Distribution
 
@@ -111,6 +120,12 @@ To install the package from the source tree, you can simply use pip:
 pip install .
 ```
 
+or
+
+```bash
+make install
+```
+
 Or you can install the package such as Python looks into your source tree for the latest version:
 
 ```bash
@@ -121,6 +136,12 @@ To uninstall the package:
 
 ```bash
 pip uninstall mylib_template
+```
+
+or 
+
+```bash
+make uninstall
 ```
 
 The full list of classifiers can be found [here](https://pypi.org/pypi?%3Aaction=list_classifiers).
@@ -160,11 +181,24 @@ Build the distribution packages you want to upload:
 python setup.py sdist bdist_wheel
 ```
 
+or
+
+```bash
+make dist
+```
+
 Finally, upload with twine either on Test PyPi or PyPi:
 
 ```bash
 twine upload --repository testpypi dist/*
 twine upload dist/*
+```
+
+or
+
+```bash
+make pypi
+make testpypi
 ```
 
 Now it's uploaded, you can install with the following command line depending on where the package is hosted:
@@ -192,6 +226,12 @@ To run the tests from the source tree
 PYTHONPATH=./src:${PYTHONPATH} pytests ./tests
 ```
 
+or
+
+```bash
+make test
+```
+
 If instead you want to run tests for the installed version:
 
 ```bash
@@ -199,6 +239,10 @@ pytests ./tests
 ```
 
 ## Continuous integration
+
+### Travis CI
+
+Travis CI is probably the simplest solution for an open-source project because the required setting is minimum. 
 
 To set up test-on-build with Travis CI:
 
@@ -217,12 +261,55 @@ python:
   - "3.8"
 install:
   - pip install -r requirements.txt
+  - pip install -r requirements_tests.txt
 script:
   - pytest ./tests
 ```
 
 You can check that the web hook for GitHub has been created. Go to the settings of the project in GitHub and check that 
 you have a web hook registered for Travis CI. Travis CI gets notified whenever a new commit is submitted to GitHub.
+
+### Jenkins
+
+If you want to go with Jenkins instead, you need to have a dedicated server with Jenkins running, look at 
+[here](./Jenkins.md) to do so.
+
+Once you have set up a Jenkins build on your server, one simple way to pack everything to run on the Jenkins server is 
+to provide a `makefile` in your repository. Several steps that are taken care by Travis CI shall have to be implemented 
+from scratch here:
+
+```makefile
+MINICONDA = Miniconda3-latest-Linux-x86.sh
+MINICONDA_URL = https://repo.anaconda.com/miniconda
+
+jenkins_miniconda:
+	wget -q ${MINICONDA_URL}/${MINICONDA}
+	sh ${MINICONDA} -u -b -p miniconda
+	rm -f ${MINICONDA}
+
+jenkins_install_reqs: jenkins_miniconda
+	./miniconda/bin/pip install -r requirements.txt
+	./miniconda/bin/pip install -r requirements_tests.txt
+
+jenkins_test: jenkins_install_reqs jenkins_miniconda
+	PYTHONPATH=src:${PYTHONPATH} pytest --cov=$(LIB_NAME) ./tests
+
+jenkins_delete_miniconda: jenkins_test
+	rm -rf miniconda
+
+jenkins: jenkins_delete_miniconda jenkins_test
+```
+
+The makefile implements a target that will download and install the latest Miniconda package. In this environment, 
+the requirements of the package are installed along with all additional requirements for tests. Tests are then executed 
+with pytest.
+
+With this `makefile`, you only have to run the following shell command in the Jenkins build:
+
+```bash
+make jenkins
+```
+
 
 ## Test coverage
 
