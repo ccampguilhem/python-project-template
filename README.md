@@ -240,7 +240,7 @@ configuration file is provided:
 
 ```ini
 [tox]
-envlist = py37
+envlist = py36,py37
 
 [testenv]
 # install pytest in the virtualenv where commands will be executed
@@ -307,20 +307,19 @@ MINICONDA_URL = https://repo.anaconda.com/miniconda
 
 jenkins_miniconda:
 	wget -q ${MINICONDA_URL}/${MINICONDA}
-	sh ${MINICONDA} -u -b -p miniconda
+	sh ${MINICONDA} -u -b -p .miniconda
 	rm -f ${MINICONDA}
 
-jenkins_install_reqs: jenkins_miniconda
-	./miniconda/bin/pip install -r requirements.txt
-	./miniconda/bin/pip install -r requirements_tests.txt
+jenkins_install_envs: jenkins_miniconda
+	./.miniconda/bin/conda create -y -n py36 python=3.6
+	./.miniconda/envs/py36/bin/pip install tox
+	./.miniconda/bin/conda create -y -n py37 python=3.7
+	./.miniconda/envs/py37/bin/pip install tox
 
-jenkins_test: jenkins_install_reqs jenkins_miniconda
-	PYTHONPATH=src:${PYTHONPATH} pytest --cov=$(LIB_NAME) ./tests
+jenkins_test: jenkins_install_envs jenkins_miniconda
+	PATH=.miniconda/envs/py36/bin:.miniconda/envs/py37/bin:${PATH} tox
 
-jenkins_delete_miniconda: jenkins_test
-	rm -rf miniconda
-
-jenkins: jenkins_delete_miniconda jenkins_test
+jenkins: jenkins_test
 ```
 
 The makefile implements a target that will download and install the latest Miniconda package. In this environment, 
