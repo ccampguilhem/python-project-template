@@ -17,6 +17,13 @@ reqs:
 test:
 	PYTHONPATH=src:${PYTHONPATH} pytest --cov=$(LIB_NAME) ./tests
 
+tox:
+	tox
+
+pep8:
+	-flake8
+	-pylint src/
+
 dist:
 	rm -rf dist
 	python setup.py sdist bdist_wheel

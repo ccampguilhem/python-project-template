@@ -1,5 +1,9 @@
 #!coding: utf-8
+"""
+hello module
 
+:author: Cédric Campguilhem
+"""
 def hello(name: str) -> str:
     """
     Say hello
@@ -8,4 +12,3 @@ def hello(name: str) -> str:
     :return: hello message
     """
     return f"Hello {name}!"
-

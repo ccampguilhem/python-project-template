@@ -1,4 +1,11 @@
 #!coding: utf-8
+"""
+version module
+
+This module contains functions to document version, build and commit of the package.
+
+:author: Cédric Campguilhem
+"""
 import os
 import json
 from typing import Optional

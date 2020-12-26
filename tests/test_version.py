@@ -21,5 +21,3 @@ def test_build(version_file_path):
 
 def test_commit(version_file_path):
     assert mylib.version.commit(version_file_path) == "67b5a64f28768efddde516cc78b4ce92602c879b"
-
-

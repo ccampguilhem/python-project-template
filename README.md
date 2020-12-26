@@ -1,4 +1,5 @@
 <a id="Top"></a>
+
 [![PyPI](https://img.shields.io/pypi/v/mylib-template?logo=pypi&logoColor=yellow)](https://pypi.org/project/mylib-template/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mylib-template?logo=python&logoColor=yellow)](https://pypi.org/project/mylib-template/)
 [![PyPI - Implementation](https://img.shields.io/pypi/implementation/mylib-template)](https://pypi.org/project/mylib-template/)
@@ -45,9 +46,12 @@ The layout looks like this:
 - LICENSE
 - setup.py
 - setup.cfg
+- makefile
 - .gitignore
 - .travis.yml
+- .pylintrc
 - requirements.txt
+- requirements_test.txt
 ```
 
 Or with a non-Python extension:
@@ -61,14 +65,7 @@ Or with a non-Python extension:
     - c
         - include
         - src
-- tests
-- README.md
-- LICENSE
-- setup.py
-- setup.cfg
-- .gitignore
-- .travis.yml
-- requirements.txt
+- ...
 ```
 
 ## Dependencies
@@ -238,6 +235,32 @@ If instead you want to run tests for the installed version:
 pytests ./tests
 ```
 
+The repository is also configured to run tests with [tox](https://tox.readthedocs.io/en/latest/index.html). A simple 
+configuration file is provided:
+
+```ini
+[tox]
+envlist = py37
+
+[testenv]
+# install pytest in the virtualenv where commands will be executed
+deps =
+    -r requirements_tests.txt
+    -r requirements.txt
+commands =
+    # NOTE: you can run any command line tool here - not just tests
+    pytest --cov=mylib tests
+```
+
+tox can then be run this way:
+
+```bash
+# with tox executable
+tox
+# with make
+make tox
+```
+
 ## Continuous integration
 
 ### Travis CI
@@ -310,7 +333,6 @@ With this `makefile`, you only have to run the following shell command in the Je
 make jenkins
 ```
 
-
 ## Test coverage
 
 ### Using Travis CI
@@ -379,5 +401,42 @@ To come...
 
 ## Code analysis
 
-To come...
+The project is structured to use both `flake8` and `pylint The configuration for the first one in included in the 
+`setup.cfg` file:
 
+```ini
+[flake8]
+ignore =
+exclude = .git,__pycache__,tests,doc/src/conf.py,build,dist
+max-complexity = 10
+max-line-length = 120
+```
+
+The second one has a dedicated file `.pylintrc` that you can initiate from command line this way:
+
+```bash
+pylint --generate-rcfile > .pylintrc
+```
+
+To can execute code analysis from command line:
+
+```bash
+# flake8
+flake8
+# pylint
+pylint src/
+```
+
+or using `makefile` if it includes the following section:
+
+```makefile
+pep8:
+	-flake8
+	-pylint src/
+```
+
+the command line to invoke it being:
+
+```bash
+make pep8
+```

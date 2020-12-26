@@ -21,3 +21,6 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
   # This is for Coveralls.io
   - coveralls -v
+  # Flake8 PEP8 check
+  - flake8
+  - pylint src/
