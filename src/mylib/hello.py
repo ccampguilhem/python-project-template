@@ -4,6 +4,8 @@ hello module
 
 :author: Cédric Campguilhem
 """
+
+
 def hello(name: str) -> str:
     """
     Say hello

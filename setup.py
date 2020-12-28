@@ -71,4 +71,7 @@ setuptools.setup(
     package_dir={"": "src"},
     package_data={"mylib": ["version.json"]},
     python_requires=">=3.6",
+    install_requires=[
+        'stdlib_list>=0.8',
+    ],
 )

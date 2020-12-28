@@ -1,1 +1,2 @@
 setuptools>=51.0.0
+stdlib_list>=0.8.0
