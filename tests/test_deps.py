@@ -38,7 +38,6 @@ def test_numpy_dependencies(tmpdir):
     assert "Numeric" in deps
     assert "code_generators" in deps
     assert "setuptools" in deps
-    assert "mkl" in deps
     assert "nose" in deps
     assert "numarray" in deps
     assert "numpy_api" in deps
